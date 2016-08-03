@@ -1,1 +1,5 @@
-require 'bpod/version'
+require_relative './bpod/version'
+require_relative './bpod/region'
+require_relative './bpod/parser'
+require_relative './bpod/os'
+require_relative './bpod/downloader'

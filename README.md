@@ -6,7 +6,7 @@
 
 ## Description
 
-TODO: Description
+This gem will download the Bing home page image of the day and set it as your desktop wallpaper.
 
 ## Features
 

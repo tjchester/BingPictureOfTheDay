@@ -7,8 +7,8 @@ require 'bpod/version'
 Gem::Specification.new do |gem|
   gem.name          = "bpod"
   gem.version       = Bpod::VERSION
-  gem.summary       = %q{TODO: Summary}
-  gem.description   = %q{TODO: Description}
+  gem.summary       = %q{Download Bing home page image of the day and set as desktop wallpaper.}
+  gem.description   = %q{Download Bing home page image of the day and set as desktop wallpaper.}
   gem.license       = "MIT"
   gem.authors       = ["Thomas Chester"]
   gem.email         = "tjchester@me.com"
