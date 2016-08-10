@@ -35,7 +35,7 @@ module Bpod
 
     def execute(to_file = 'bpod.txt', to_folder = Bpod::Os.get_temp_folder, url = @url)
       @metafile = File.join(to_folder, to_file)
-      open(@metafile, "w") do |file|
+      open(@metafile, "wb") do |file|
         file << open(url).read
       end
     end

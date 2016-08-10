@@ -1,6 +1,6 @@
 module Bpod
   # Bing markets (i.e. regions)
-  REGIONS = {
+  REGION = {
     'es-AR' => 'Argentina',
     'en-AU' => 'Australia',
     'de-AT' => 'Austria',

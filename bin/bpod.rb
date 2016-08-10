@@ -14,7 +14,7 @@ optparse = OptionParser.new do |opts|
   end
   
   opts.on("-r", "--region-code REGION", "Region code for Bing market area, for example en-US.") do |region|
-    if Bpod::REGIONS.has_key? region
+    if Bpod::REGION.has_key? region
       options[:region] = region
     else
       puts "#{region} is not a valid region code. Defaulting to en-US."
@@ -44,7 +44,7 @@ begin
   end
 
   puts "Images will be downloaded for the market"
-  puts Bpod::REGIONS[options[:region]]
+  puts Bpod::REGION[options[:region]]
 
   puts "Images will be downloaded to the folder"
   puts options[:image_folder]

@@ -5,7 +5,11 @@ module Bpod
 
   class Os
 
-    def self.get_picture_folder
+    SPI_SETDESKWALLPAPER = 20
+    SPIF_UPDATEINIFILE = 0x1
+    SPIF_SENDWININICHANGE = 0x2
+
+	  def self.get_picture_folder
       File.join(Dir.home, "Pictures")
     end
 
@@ -29,6 +33,12 @@ module Bpod
       if OS.osx?
         %x{osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \"#{image}\"'}
         puts "Set wallpaper returned: #{$?}"
+	    elsif OS.windows?
+        require "Win32API" 
+
+        api = Win32API.new('user32', 'SystemParametersInfoA', ['I', 'I', 'P', 'I'], 'I')
+        rc = api.call(SPI_SETDESKWALLPAPER, 0, image, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
+        puts "Set wallpaper returned: #{rc}"
       else
         puts "Unknown OS"
       end
