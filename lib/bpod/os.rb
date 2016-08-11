@@ -9,6 +9,11 @@ module Bpod
     SPIF_UPDATEINIFILE = 0x1
     SPIF_SENDWININICHANGE = 0x2
 
+    def self.folder_exists?(folder)
+      return false if Dir[directory] == nil
+      true
+    end
+
 	  def self.get_picture_folder
       File.join(Dir.home, "Pictures")
     end
@@ -25,22 +30,17 @@ module Bpod
       Dir.tmpdir
     end
 
-    def self.set_wallpaper(file_name, file_path)
-      image = File.join(file_path, file_name)
-
-      puts "Setting wallpaper to #{image}"
-
+    def self.set_wallpaper(file)
       if OS.osx?
-        %x{osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \"#{image}\"'}
-        puts "Set wallpaper returned: #{$?}"
+        %x{osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \"#{file}\"'}
+        $?
 	    elsif OS.windows?
         require "Win32API" 
 
         api = Win32API.new('user32', 'SystemParametersInfoA', ['I', 'I', 'P', 'I'], 'I')
-        rc = api.call(SPI_SETDESKWALLPAPER, 0, image, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
-        puts "Set wallpaper returned: #{rc}"
+        api.call(SPI_SETDESKWALLPAPER, 0, file, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
       else
-        puts "Unknown OS"
+        raise "Unable to set wallpaper for current operating system."
       end
     end
 

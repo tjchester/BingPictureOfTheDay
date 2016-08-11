@@ -9,8 +9,13 @@ options = {}
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: bpod [options]"
 
-  opts.on("-d", "--image-folder FOLDER", "Full file path where images will be stored.") do |folder|
-    options[:image_folder] = folder
+  opts.on("-f", "--image-folder FOLDER", "Full file path where images will be stored.") do |folder|
+    if Bpod::Os.folder_exists? folder
+      options[:image_folder] = folder
+    else
+      puts "#{folder} does not exist. Creating a bpod folder within your Pictures folder."
+      options[:image_folder] = Bpod::Os.create_wallpaper_folder("bpod")
+    end
   end
   
   opts.on("-r", "--region-code REGION", "Region code for Bing market area, for example en-US.") do |region|
@@ -19,6 +24,22 @@ optparse = OptionParser.new do |opts|
     else
       puts "#{region} is not a valid region code. Defaulting to en-US."
     end
+  end
+
+  opts.on("-d", "--download-image", "Download the image of the day.") do
+    options[:download] = true
+  end
+
+  opts.on("-f", "--force-download", "Download image even if not within download window.") do 
+    options[:force] = true
+  end
+
+  opts.on("-s", "--set-wallpaper", "Set desktop wallpaper using latest downloaded image") do
+    options[:set_wallpaper] = true
+  end
+
+  opts.on("-v", "--verbose", "Display messages about which actions are occurring.") do
+    options[:verbose] = true
   end
 
   opts.on("-h", "--help", "Display usage information") do
@@ -30,48 +51,28 @@ end
 
 begin
   optparse.parse!
-  if options[:image_folder].nil?
-    options[:image_folder] = Bpod::Os.create_wallpaper_folder "bpod"
+  
+  app = Bpod::App.new options[:image_folder], options[:region] do |obj|
+    obj.force = options[:force] ||= false
+    obj.verbose = options[:verbose] ||= false
   end
 
-  if options[:region].nil?
-    options[:region] = 'en-US'
+  if options[:download]
+    begin
+      app.download
+    rescue Bpod::NoDownloadWindowException
+      puts "Home page image only changes once per day. You already have the latest image."
+      puts app if options[:verbose]
+    rescue Bpod::DownloadQuotaExceeded
+      puts "Bing download quota exceeded, try again later"
+      puts app if options[:verbose]
+    end  
   end
 
-  if !Bpod::Downloader.download_window_exists?(options[:image_folder])
-    puts "Home page image only changes once per day. You already have the latest image."
-    exit 
+  begin
+    app.set_wallpaper if options[:set_wallpaper]
+  rescue Bpod::UnknownOsException
+    puts "Unable to set wallpaper for current operating system."
   end
-
-  puts "Images will be downloaded for the market"
-  puts Bpod::REGION[options[:region]]
-
-  puts "Images will be downloaded to the folder"
-  puts options[:image_folder]
-
-  puts "Creating downloader object"
-  downloader = Bpod::Downloader.new("js", options[:region], 1, 0)
-
-  puts "Downloading the image metafile"
-  downloader.execute
-
-  puts "Metafile saved to the following location"
-  metafile = downloader.metafile
-  puts metafile
-
-  puts "Building JSON object from saved metafile"
-  json_object = Bpod::Parser.new(File.read(metafile)).obj
-
-  puts "URL of image to fetch is"
-  image_url = json_object.images[0].url
-  puts image_url
-
-  puts "Downloading image of the day"
-  image_name = File.basename(image_url)
-  puts image_name
-  downloader.execute image_name, options[:image_folder], "http://www.bing.com#{image_url}"
-
-  puts "Setting downloaded image as the wallpaper"
-  Bpod::Os.set_wallpaper image_name, options[:image_folder]
 
 end
