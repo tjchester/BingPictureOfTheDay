@@ -39,7 +39,7 @@ module Bpod
     def download
       raise Bpod::NoDownloadWindowException if !download_window_exists? && !@force
   
-      @url = URL_TEMPLATE.sub(/\$FORMAT/, "js").sub(/\$IDX/, "1").sub(/\$NUMBER/, "0").sub(/\$REGION/, region) 
+      @url = URL_TEMPLATE.sub(/\$FORMAT/, "js").sub(/\$IDX/, "0").sub(/\$NUMBER/, "1").sub(/\$REGION/, region) 
 
       verbose "Downloading meta information from url #{@url}"
       verbose "  and saving to file #{@meta_file}"
