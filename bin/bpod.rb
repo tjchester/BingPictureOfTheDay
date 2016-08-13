@@ -9,7 +9,7 @@ options = {}
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: bpod [options]"
 
-  opts.on("-f", "--image-folder FOLDER", "Full file path where images will be stored.") do |folder|
+  opts.on("-i", "--image-folder FOLDER", "Full file path where images will be stored.") do |folder|
     if Bpod::Os.folder_exists? folder
       options[:image_folder] = folder
     else
@@ -42,7 +42,7 @@ optparse = OptionParser.new do |opts|
     options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Display usage information") do
+  opts.on("-h", "-?", "--help", "Display usage information") do
     puts opts
     exit
   end
@@ -52,6 +52,12 @@ end
 begin
   optparse.parse!
   
+  if !options[:download] && !options[:set_wallpaper]
+    puts "No options specified, defaulting to download and set wallpaper."
+    options[:download] = true
+    options[:set_wallpaper] = true
+  end
+
   app = Bpod::App.new options[:image_folder], options[:region] do |obj|
     obj.force = options[:force] ||= false
     obj.verbose = options[:verbose] ||= false
@@ -63,8 +69,11 @@ begin
     rescue Bpod::NoDownloadWindowException
       puts "Home page image only changes once per day. You already have the latest image."
       puts app if options[:verbose]
-    rescue Bpod::DownloadQuotaExceeded
+    rescue Bpod::DownloadQuotaExceededException
       puts "Bing download quota exceeded, try again later"
+      puts app if options[:verbose]
+    rescue Bpod::InvalidMetadataUrlParameterException
+      puts "An internal error has occurred. The Bing meta information page has returned null which indicates bad parameter values."
       puts app if options[:verbose]
     end  
   end

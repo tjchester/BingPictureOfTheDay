@@ -5,19 +5,32 @@ module Bpod
 
   class Os
 
+    # Constant used by the Win32 *SystemParametersInfoA* function.
     SPI_SETDESKWALLPAPER = 20
+
+    # Constant used by the Win32 *SystemParametersInfoA* function.
     SPIF_UPDATEINIFILE = 0x1
+
+    # Constant used by the Win32 *SystemParametersInfoA* function.
     SPIF_SENDWININICHANGE = 0x2
 
+    # Returns true if the specified *folder* exists.
     def self.folder_exists?(folder)
       return false if Dir[directory] == nil
       true
     end
 
+    # Returns path of the *Pictures* folder within the current user's
+    # home folder. This does not necessarily mean that the folder
+    # actually exists.
 	  def self.get_picture_folder
       File.join(Dir.home, "Pictures")
     end
 
+    # Creates folder and returns full path to a specified *folder*
+    # created within the user's *Pictures* folder. This folder will
+    # be used as the default folder to hold the downloaded image folders
+    # when a specific folder is not supplied.
     def self.create_wallpaper_folder(folder)
       new_folder = File.join(get_picture_folder, folder)
 
@@ -26,10 +39,13 @@ module Bpod
       new_folder
     end
 
+    # Returns path of the operating system specific *Temp* folder
     def self.get_temp_folder
       Dir.tmpdir
     end
 
+    # Sets the desktop wallpaper to the specified file name and path
+    # specified by *file*.
     def self.set_wallpaper(file)
       if OS.osx?
         %x{osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \"#{file}\"'}
