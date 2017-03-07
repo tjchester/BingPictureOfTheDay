@@ -12,7 +12,7 @@ module Bpod
   class App
 
     # String template used downloading image metadata information from Bing about current home page image.
-    URL_TEMPLATE = "http://www.bing.com/HPImageArchive.aspx?format=$FORMAT&idx=$IDX&n=$NUMBER&mkt=$REGION"    
+    URL_TEMPLATE = "http://www.bing.com/HPImageArchive.aspx?format=$FORMAT&idx=$IDX&n=$NUMBER&mkt=$REGION"
     #FORMATS = ["xml", "js", "rss"]
     #RESOLUTIONS = { :high => "1920x1080", :low => "1366x768"}
 
@@ -40,7 +40,7 @@ module Bpod
     # Parameters [optional]:
     # - image_folder - Full path of folder to store images in (defaults to $HOME/Pictures/bpod)
     # - region - Marketing region code of images to download (defaults to 'en-US')
-    # 
+    #
     # If a block is supplied then this function will return a reference to the object.
     def initialize(image_folder, region)
       @verbose = false
@@ -57,8 +57,8 @@ module Bpod
     # Downloads the latest image
     def download
       raise Bpod::NoDownloadWindowException if !download_window_exists? && !@force
-  
-      @url = URL_TEMPLATE.sub(/\$FORMAT/, "js").sub(/\$IDX/, "0").sub(/\$NUMBER/, "1").sub(/\$REGION/, region) 
+
+      @url = URL_TEMPLATE.sub(/\$FORMAT/, "js").sub(/\$IDX/, "0").sub(/\$NUMBER/, "1").sub(/\$REGION/, region)
 
       verbose "Downloading meta information from url #{@url}"
       verbose "  and saving to file #{@meta_file}"
@@ -95,20 +95,20 @@ module Bpod
     # String representation of object for debugging purposes
     def to_s
         "#{self.class} \n" +
-        "  object_id: #{self.object_id} \n" + 
-        "  version: #{Bpod::VERSION} \n" +  
-        "  verbose: #{@verbose} \n" + 
-        "  force: #{@force} \n" + 
-        "  image_folder: #{@image_folder} \n" + 
+        "  object_id: #{self.object_id} \n" +
+        "  version: #{Bpod::VERSION} \n" +
+        "  verbose: #{@verbose} \n" +
+        "  force: #{@force} \n" +
+        "  image_folder: #{@image_folder} \n" +
         "  region: #{@region} \n" +
         "  image_name: #{@image_name} \n" +
-        "  image_url: #{@image_url} \n" + 
+        "  image_url: #{@image_url} \n" +
         "  meta_file: #{@meta_file} \n" +
         "end"
     end
 
   private
-    
+
     def download_window_exists?
       newest_file = newest_file_in_folder @image_folder
 
@@ -122,7 +122,7 @@ module Bpod
         file << open(from_url).read
       end
     end
-  
+
     def newest_file_in_folder(folder)
       Dir.glob("#{folder}/*").max_by {|f| File.mtime(f)}
     end

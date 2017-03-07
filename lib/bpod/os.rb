@@ -44,6 +44,11 @@ module Bpod
       Dir.tmpdir
     end
 
+    # Returns true if command can be found (linx, osx only)
+    def self.found?(program)
+      system("which #{program} > /dev/null 2>&1")
+    end
+
     # Sets the desktop wallpaper to the specified file name and path
     # specified by *file*.
     def self.set_wallpaper(file)
@@ -51,10 +56,19 @@ module Bpod
         %x{osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \"#{file}\"'}
         $?
 	    elsif OS.windows?
-        require "Win32API" 
+        require "Win32API"
 
         api = Win32API.new('user32', 'SystemParametersInfoA', ['I', 'I', 'P', 'I'], 'I')
         api.call(SPI_SETDESKWALLPAPER, 0, file, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
+      elsif OS.linux?
+        if found? "gsettings" # Gnome3
+          %x{gsettings set org.gnome.desktop.background picture-uri 'file://#{file}'}
+        elsif found? "feh" # X Windows
+          %x{feh --bg-scale #{file}}
+          $?
+        else
+          raise "Unable to locate program to set linux background."
+        end
       else
         raise "Unable to set wallpaper for current operating system."
       end
