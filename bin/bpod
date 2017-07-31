@@ -34,6 +34,10 @@ optparse = OptionParser.new do |opts|
     options[:force] = true
   end
 
+  opts.on("-n", "--show-notification", "Display notification message after image is downloaded") do
+    options[:show_notification] = true
+  end
+
   opts.on("-s", "--set-wallpaper", "Set desktop wallpaper using latest downloaded image") do
     options[:set_wallpaper] = true
   end
@@ -80,6 +84,7 @@ begin
 
   begin
     app.set_wallpaper if options[:set_wallpaper]
+    app.show_notification if options[:show_notification]
   rescue Bpod::UnknownOsException
     puts "Unable to set wallpaper for current operating system."
   end

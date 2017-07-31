@@ -37,6 +37,12 @@ module Bpod
     # Full path of file containing downloaded metadata information.
     attr_reader :meta_file
 
+    # Image description (included in metadata)
+    attr_reader :image_description
+
+    # Url to get more information about image (included in metadata)
+    attr_reader :image_description_url
+
     # Parameters [optional]:
     # - image_folder - Full path of folder to store images in (defaults to $HOME/Pictures/bpod)
     # - region - Marketing region code of images to download (defaults to 'en-US')
@@ -50,6 +56,8 @@ module Bpod
       @region = 'en-US' if region.nil?
       @meta_file = File.join(Os::get_temp_folder, "bpod.json")
       @image_name = nil
+      @image_description = nil
+      @image_description_url = nil
 
       yield self if block_given?
     end
@@ -74,6 +82,12 @@ module Bpod
       @image_url = json_object.images[0].url
       verbose "The latest image is located at #{image_url}"
 
+      @image_description = json_object.images[0].copyright
+      verbose "The image description is #{image_description}"
+
+      @image_description_url = json_object.images[0].copyrightlink
+      verbose "The image description link is #{image_description_url}"
+
       @image_name = File.basename(@image_url)
       verbose "Downloading #{image_name} to #{@image_folder}"
       download_file File.join(@image_folder, @image_name), "http://www.bing.com#{image_url}"
@@ -92,6 +106,30 @@ module Bpod
       end
     end
 
+    # Shows a notification after wallpaper is downloaded and set
+    def show_notification
+      # if when we get here the @image_description is nil then we
+      # need to reload the metadata file and get the information 
+      # out of there.
+      contents = File.read(@meta_file)
+
+      raise InvalidMetadataUrlParameterException if contents == "null"
+
+      json_object = string_to_json_object contents
+      
+      @image_description = json_object.images[0].copyright
+      verbose "The image description is #{image_description}"
+
+      @image_description_url = json_object.images[0].copyrightlink
+      verbose "The image description link is #{image_description_url}"
+
+      begin
+        Bpod::Os.show_notification @image_description
+      rescue
+        raise UnknownOsException
+      end
+    end
+
     # String representation of object for debugging purposes
     def to_s
         "#{self.class} \n" +
@@ -103,6 +141,8 @@ module Bpod
         "  region: #{@region} \n" +
         "  image_name: #{@image_name} \n" +
         "  image_url: #{@image_url} \n" +
+        "  image_description: #{@image_description} \n" +
+        "  image_description_url: #{@image_description_url} \n" +
         "  meta_file: #{@meta_file} \n" +
         "end"
     end

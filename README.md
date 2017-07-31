@@ -28,7 +28,8 @@ Usage: bpod [options]
     -r, --region-code REGION         Region code for Bing market area, for example en-US.
     -d, --download-image             Download the image of the day.
     -f, --force-download             Download image even if not within download window.
-    -s, --set-wallpaper              Set desktop wallpaper using latest downloaded image
+    -n, --show-notification          Display a desktop notification when wallpaper is changed.
+    -s, --set-wallpaper              Set desktop wallpaper using latest downloaded image.
     -v, --verbose                    Display messages about which actions are occurring.
     -h, -?, --help                   Display usage information
 ```
@@ -46,6 +47,6 @@ If you do not specify any options then the following defaults will be used:
 
 ## Copyright
 
-Copyright (c) 2016 Thomas Chester
+Copyright (c) 2017 Thomas Chester
 
 See LICENSE.txt for details.

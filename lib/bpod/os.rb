@@ -74,6 +74,21 @@ module Bpod
       end
     end
 
+    # Displays a notification message after the image has been
+    # downloaded.
+    def self.show_notification(message)
+      if OS.osx?
+        %x{osascript -e 'display notification \"#{message}\" with title \"Bing Picture of the Day\"'}
+        $?
+      elsif OS.windows?
+        raise "Unable to locate program to set Windows background."
+      elsif OS.linux?
+        %x{notify-send -t 3000 'Bing Picture of the Day', '#{message}'}
+      else
+        raise "Unable to set wallpaper for current operating system."
+      end
+    end
+
   end
 
 end
