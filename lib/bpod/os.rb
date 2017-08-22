@@ -77,6 +77,7 @@ module Bpod
     # Displays a notification message after the image has been
     # downloaded.
     def self.show_notification(message)
+      message.gsub! "'", ""
       if OS.osx?
         %x{osascript -e 'display notification \"#{message}\" with title \"Bing Picture of the Day\"'}
         $?
